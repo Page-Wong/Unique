@@ -63,32 +63,29 @@ cc.Class({
         }
     },
     _addHorizontalItem(crossItems){
-        for (let i = 0; i < this._difficulty.x; i++) {
-            for (let j = 0; j < this._difficulty.y; j++) {
-                if (this.crossItems[i][j] == 1) {
+        for (let i = 0; i < this._difficulty.y; i++) {
+            this.itemAry[i] = []
+            this.containerAry[i] = []
+            for (let j = 0; j < this._difficulty.x; j++) {
+                if (this.crossItems[j][i] === 1) {
                     var item = cc.instantiate(this.item);
-                    item.width = this.itemWidth
-                    item.height = this.itemHeight
-                    this.tmpItemAry.push(item)
+                    item.name = 'h_'+ j + '_' + i
+                    item.setPosition(0, this.itemSize / 2)
+                    item.getComponent('Item').setItemSize(this.itemSize)
+                    this.itemAry[i].push(item)
                 }
-                else if(this.tmpItemAry.length > 0) {
+                if(this.itemAry[i].length > 0 && this.containerAry[i].length === 0 && (this.crossItems[j][i] === 0 || j === this._difficulty.x - 1)) {
                     var container = cc.instantiate(this.container);
-                    this.tmpItemAry.forEach(element => {
-                        container.addChild(element)
+                    container.parent = this.node 
+                    var s_container = container.getComponent('Container')
+                    s_container.setType(0)
+                    s_container.setGridXY(j, i)
+                    this.itemAry[i].forEach(element => {
+                        s_container.addItem(element)
                     });                    
-                    container.width = this.itemWidth * this.tmpItemAry.length
-                    container.height = this.itemHeight
-                    container.type = cc.HORIZONTAL
-                    this.tmpContainerAry.push(container)
-                    this.tmpItemAry = []
+                    this.containerAry[i].push(container)
                 }
             } 
-            if(this.tmpContainerAry.length > 0) {
-                this.tmpContainerAry.forEach(element => {
-                    this.node.addChild(element)
-                });
-                this.tmpContainerAry = []
-            }
         }
     },
     _clearBoard(){
@@ -101,10 +98,9 @@ cc.Class({
     },
     onLoad () {
         this._difficulty = this.difficultyAry[this.difficulty]  
-        this.tmpContainerAry = []
-        this.tmpItemAry = []
-        this.itemWidth = this.node.width / this._difficulty.x + 10
-        this.itemHeight = this.node.height / this._difficulty.y + 10
+        this.containerAry = []
+        this.itemAry = []
+        this.itemSize = this.node.width > this.node.height ? this.node.height : this.node.width
         this.resetBoard()
     },
 

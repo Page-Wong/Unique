@@ -14,7 +14,7 @@ cc.Class({
         cross_item_sprite:{
             type:cc.SpriteFrame,
             default:null,
-        },
+        },        
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -22,13 +22,18 @@ cc.Class({
     // onLoad () {},
 
     start () {
-        this.itemTypes = [ this.cross_item_sprite, this.horizontal_item_sprite, this.vertical_item_sprite,]
     },
 
     // 设置方块类型
-    setType: function (itemType) {
-        this.itemType = itemType;
-        this.getComponent(cc.Sprite).spriteFrame = this.itemTypes[itemType];
+    setType: function (itemType) {        
+        this.itemTypes = [ this.cross_item_sprite, this.horizontal_item_sprite, this.vertical_item_sprite,],
+        this.itemType = this.itemTypes[itemType];
+        this.getComponent(cc.Sprite).spriteFrame = this.itemType;
+    },
+    setItemSize: function (itemSize) {
+        this.itemSize = itemSize
+        this.node.width = itemSize * 0.9
+        this.node.height = itemSize * 0.9
     },
     // 设置网格坐标
     setGridXY: function (x,y) {

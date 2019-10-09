@@ -49,8 +49,8 @@
     },
     "_position": {
       "__type__": "cc.Vec3",
-      "x": 0,
-      "y": 0,
+      "x": 359.99999999999994,
+      "y": 640,
       "z": 0
     },
     "_scale": {
@@ -88,7 +88,7 @@
       "__uuid__": "15e8ac0f-3a16-420f-9803-25843d8284a9"
     },
     "_type": 1,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
