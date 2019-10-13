@@ -24,22 +24,6 @@ cc.Class({
             type:cc.Prefab,
             default:null,
         },
-        item:{
-            type:cc.Prefab,
-            default:null,
-        },
-        horizontal_item_color:{
-            type:cc.color,
-            default:new cc.Color(255, 255, 255, 128),
-        },
-        vertical_item_color:{
-            type:cc.color,
-            default:new cc.Color(255, 255, 255, 128),
-        },
-        cross_item_color:{
-            type:cc.color,
-            default:new cc.Color(255, 255, 255, 128),
-        },
         difficultyAry:{
             type:[difficultySetting],
             default:[],
@@ -62,31 +46,51 @@ cc.Class({
             this.crossItems.push(tmpAry)
         }
     },
-    _addHorizontalItem(crossItems){
+    _initHorizontalContainers(crossItems){
         for (let i = 0; i < this._difficulty.y; i++) {
             this.itemAry[i] = []
-            this.containerAry[i] = []
+            this.containerAry[i] = []     
+            var containerCount = 0
             for (let j = 0; j < this._difficulty.x; j++) {
+                var m_container = this.containerAry[i][containerCount]
                 if (this.crossItems[j][i] === 1) {
-                    var item = cc.instantiate(this.item);
-                    item.name = 'h_'+ j + '_' + i
-                    item.setPosition(0, this.itemSize / 2)
-                    item.getComponent('Item').setItemSize(this.itemSize)
-                    this.itemAry[i].push(item)
+                    if (m_container == undefined){
+                        m_container = cc.instantiate(this.container);
+                        m_container.parent = this.node   
+                        m_container.getComponent('Container').setType(0)
+                        m_container.getComponent('Container').setCellSize(this.itemSize)
+                        this.containerAry[i][containerCount] = m_container
+                    }                  
+                    m_container.getComponent('Container').addItem()
                 }
-                if(this.itemAry[i].length > 0 && this.containerAry[i].length === 0 && (this.crossItems[j][i] === 0 || j === this._difficulty.x - 1)) {
-                    var container = cc.instantiate(this.container);
-                    container.parent = this.node 
-                    var s_container = container.getComponent('Container')
-                    s_container.setType(0)
-                    s_container.setGridXY(j, i)
-                    this.itemAry[i].forEach(element => {
-                        s_container.addItem(element)
-                    });                    
-                    this.containerAry[i].push(container)
+                if(m_container !== undefined && (this.crossItems[j][i] === 0 || j === this._difficulty.x - 1)) {
+                    this._addHorizontalContainer(i, m_container)
+                    containerCount += 1
+                    // var container = cc.instantiate(this.container);
+                    // container.parent = this.node 
+                    // var s_container = container.getComponent('Container')
+                    // s_container.setItemSize(this.itemSize)
+                    // s_container.setType(0)
+                    // s_container.setGridXY(j, i)
+                    // this.itemAry[i].forEach(element => {
+                    //     s_container.addItem(element)
+                    // });                    
+                    // this.containerAry[i].push(container)
                 }
             } 
         }
+    },
+    _addHorizontalContainer (rowNumber, m_container){
+        var x = 0;
+        var y = rowNumber;
+        for (let index = 0; index < this.containerAry[rowNumber].length - 1; index++) {
+            x += this.containerAry[rowNumber][index].getComponent('Container').itemCount            
+        }
+        m_container.parent = this.node;
+        m_container.getComponent('Container').setGridXY(x, y);
+    },
+    _addVerticalContainer (columnNumber){
+
     },
     _clearBoard(){
         this.crossItems = []
@@ -94,13 +98,14 @@ cc.Class({
     resetBoard(){
         this._clearBoard()
         this._initCrossItems()
-        this._addHorizontalItem(this.crossItems)
+        this._initHorizontalContainers(this.crossItems)
     },
     onLoad () {
         this._difficulty = this.difficultyAry[this.difficulty]  
         this.containerAry = []
         this.itemAry = []
-        this.itemSize = this.node.width > this.node.height ? this.node.height : this.node.width
+        this.difficultySetting = this.difficultyAry[this.difficulty]
+        this.itemSize = this.node.width > this.node.height ? parseInt(this.node.height / this.difficultySetting.y) : parseInt(this.node.width / this.difficultySetting.x)
         this.resetBoard()
     },
 

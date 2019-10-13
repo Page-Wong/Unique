@@ -2,30 +2,36 @@
 cc.Class({
     extends: cc.Component,
 
-    properties: {        
+    properties: {  
+        item:{
+            type:cc.Prefab,
+            default:null,
+        },
     },
 
     // LIFE-CYCLE CALLBACKS:
 
-    // onLoad () {},
-
-    start () {
-        
+    onLoad () {
+        this.itemCount = 0;
     },
+
+    // start () {
+        
+    // },
 
     // 设置方块类型
     setType: function (containerType) {        
         this.containerTypes = [ cc.Layout.Type.HORIZONTAL, cc.Layout.Type.VERTICAL]
         this.containerType = this.containerTypes[containerType];
         this.getComponent(cc.Layout).Type = this.containerType;
-        this.getComponent(cc.Layout).verticalDirection = cc.Layout.VerticalDirection.TOP_TO_BOTTOM
-        this.getComponent(cc.Layout).horizontalDirection = cc.Layout.VerticalDirection.RIGHT_TO_LEFT
+        // this.getComponent(cc.Layout).verticalDirection = cc.Layout.VerticalDirection.TOP_TO_BOTTOM
+        // this.getComponent(cc.Layout).horizontalDirection = cc.Layout.VerticalDirection.RIGHT_TO_LEFT
     },
     // 设置网格坐标
     setGridXY: function (x,y) {
         this.gridX = x;
         this.gridY = y;
-        this.node.setPosition(this.node.parent.width * -1 + this.itemSize * x, this.node.parent.height * -1 + this.itemSize * y);
+        this.node.setPosition(this.node.parent.width / 2 * -1 + this.cellSize * x, this.node.parent.height / 2 * -1 + this.cellSize * y);
     },
     setSelected:function(selected) {
         if (!selected) {
@@ -48,18 +54,29 @@ cc.Class({
             cc.moveTo(0.1, cc.p((x-5)*75 + 75/2, (y-5)*75 + 75/2))
             ));
     },
-    addItem:function (item) {
-        this.node.addChild(item)
-        switch (this.containerType) {
-            case cc.Layout.Type.HORIZONTAL:
-                this.node.height = item.height 
-                break;
-            case cc.Layout.Type.VERTICAL:    
-            this.node.width = item.width           
-                break;
+    setCellSize: function (cellSize) {
+        this.cellSize = cellSize
         
-            default:
-                break;
+        if (this.containerType === cc.Layout.Type.HORIZONTAL) {  
+            this.itemSize = cellSize - this.getComponent(cc.Layout).paddingRight
         }
+        else if (this.containerType === cc.Layout.Type.VERTICAL) {     
+            this.itemSize = cellSize - this.getComponent(cc.Layout).paddingBottom          
+        }
+        this.node.width = cellSize
+        this.node.height = cellSize
+    },
+    addItem:function () {
+        var item = cc.instantiate(this.item);
+        // item.name = 'h_'+ j + '_' + i
+        if (this.containerType === cc.Layout.Type.HORIZONTAL) {            
+            item.setPosition(0, this.cellSize / 2)
+        }
+        else if (this.containerType === cc.Layout.Type.VERTICAL) {       
+            item.setPosition(this.cellSize / 2, 0)            
+        }
+        item.getComponent('Item').setItemSize(this.itemSize)
+        this.node.addChild(item)
+        this.itemCount += 1
     }
 });

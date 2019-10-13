@@ -39,7 +39,6 @@ cc.Class({
     setGridXY: function (x,y) {
         this.gridX = x;
         this.gridY = y;
-        this.node.setPosition((x-5)*75 + 75/2, (y-5)*75 + 75/2);
     },
     setSelected:function(selected) {
         if (!selected) {
