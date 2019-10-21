@@ -32,8 +32,8 @@ cc.Class({
     },
     setItemSize: function (itemSize) {
         this.itemSize = itemSize
-        this.node.width = itemSize * 0.9
-        this.node.height = itemSize * 0.9
+        this.node.width = itemSize
+        this.node.height = itemSize
     },
     // 设置网格坐标
     setGridXY: function (x,y) {

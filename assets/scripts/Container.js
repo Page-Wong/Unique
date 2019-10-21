@@ -58,10 +58,10 @@ cc.Class({
         this.cellSize = cellSize
         
         if (this.containerType === cc.Layout.Type.HORIZONTAL) {  
-            this.itemSize = cellSize - this.getComponent(cc.Layout).paddingRight
+            this.itemSize = cellSize - this.getComponent(cc.Layout).paddingRight * 2
         }
         else if (this.containerType === cc.Layout.Type.VERTICAL) {     
-            this.itemSize = cellSize - this.getComponent(cc.Layout).paddingBottom          
+            this.itemSize = cellSize - this.getComponent(cc.Layout).paddingBottom * 2        
         }
         this.node.width = cellSize
         this.node.height = cellSize
@@ -78,5 +78,8 @@ cc.Class({
         item.getComponent('Item').setItemSize(this.itemSize)
         this.node.addChild(item)
         this.itemCount += 1
+    },
+    onClick(){
+        console.log(this.node.x, this.node.y, this.node.width, this.node.height)
     }
 });

@@ -50,22 +50,22 @@ cc.Class({
         for (let i = 0; i < this._difficulty.y; i++) {
             this.itemAry[i] = []
             this.containerAry[i] = []     
-            var containerCount = 0
+            var containerIndex = 0
             for (let j = 0; j < this._difficulty.x; j++) {
-                var m_container = this.containerAry[i][containerCount]
+                var m_container = this.containerAry[i][containerIndex]
                 if (this.crossItems[j][i] === 1) {
                     if (m_container == undefined){
                         m_container = cc.instantiate(this.container);
                         m_container.parent = this.node   
                         m_container.getComponent('Container').setType(0)
-                        m_container.getComponent('Container').setCellSize(this.itemSize)
-                        this.containerAry[i][containerCount] = m_container
+                        m_container.getComponent('Container').setCellSize(this.cellSize)
+                        this.containerAry[i][containerIndex] = m_container
                     }                  
                     m_container.getComponent('Container').addItem()
                 }
                 if(m_container !== undefined && (this.crossItems[j][i] === 0 || j === this._difficulty.x - 1)) {
                     this._addHorizontalContainer(i, m_container)
-                    containerCount += 1
+                    containerIndex += 1
                     // var container = cc.instantiate(this.container);
                     // container.parent = this.node 
                     // var s_container = container.getComponent('Container')
@@ -105,7 +105,7 @@ cc.Class({
         this.containerAry = []
         this.itemAry = []
         this.difficultySetting = this.difficultyAry[this.difficulty]
-        this.itemSize = this.node.width > this.node.height ? parseInt(this.node.height / this.difficultySetting.y) : parseInt(this.node.width / this.difficultySetting.x)
+        this.cellSize = this.node.width > this.node.height ? parseInt(this.node.height / this.difficultySetting.x) : parseInt(this.node.width / this.difficultySetting.y)
         this.resetBoard()
     },
 
