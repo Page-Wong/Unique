@@ -39,9 +39,9 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 155,
-      "g": 55,
-      "b": 55,
+      "r": 255,
+      "g": 255,
+      "b": 255,
       "a": 255
     },
     "_contentSize": {
@@ -51,8 +51,8 @@
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
-      "x": 0,
-      "y": 0
+      "x": 0.5,
+      "y": 0.5
     },
     "_position": {
       "__type__": "cc.Vec3",
@@ -94,7 +94,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": {
-      "__uuid__": "15e8ac0f-3a16-420f-9803-25843d8284a9"
+      "__uuid__": "f93a4c90-79bf-4fe1-8da8-2646b7b512a2"
     },
     "_type": 1,
     "_sizeMode": 0,
@@ -124,7 +124,7 @@
       "height": 64
     },
     "_resize": 1,
-    "_N$layoutType": 1,
+    "_N$layoutType": 2,
     "_N$padding": 0,
     "_N$cellSize": {
       "__type__": "cc.Size",
@@ -132,11 +132,11 @@
       "height": 40
     },
     "_N$startAxis": 0,
-    "_N$paddingLeft": 3,
-    "_N$paddingRight": 3,
+    "_N$paddingLeft": 0,
+    "_N$paddingRight": 0,
     "_N$paddingTop": 0,
     "_N$paddingBottom": 0,
-    "_N$spacingX": 6,
+    "_N$spacingX": 0,
     "_N$spacingY": 0,
     "_N$verticalDirection": 1,
     "_N$horizontalDirection": 0,
@@ -154,6 +154,16 @@
     "item": {
       "__uuid__": "eeb10da8-b0b4-4f3d-84f9-c94e07e0dfa0"
     },
+    "containerFrames": [
+      {
+        "__uuid__": "f93a4c90-79bf-4fe1-8da8-2646b7b512a2"
+      },
+      {
+        "__uuid__": "86014278-a6d0-4cfb-ac1b-98784acc3897"
+      }
+    ],
+    "containerZoom": 0.9,
+    "itemZoom": 0.7,
     "_id": ""
   },
   {

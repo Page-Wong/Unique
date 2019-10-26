@@ -3,17 +3,9 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        horizontal_item_sprite:{
-            type:cc.SpriteFrame,
-            default:null,
-        },
-        vertical_item_sprite:{
-            type:cc.SpriteFrame,
-            default:null,
-        },
-        cross_item_sprite:{
-            type:cc.SpriteFrame,
-            default:null,
+        itemFrames:{
+            type:[cc.SpriteFrame],
+            default:[],
         },        
     },
 
@@ -26,14 +18,22 @@ cc.Class({
 
     // 设置方块类型
     setType: function (itemType) {        
-        this.itemTypes = [ this.cross_item_sprite, this.horizontal_item_sprite, this.vertical_item_sprite,],
-        this.itemType = this.itemTypes[itemType];
-        this.getComponent(cc.Sprite).spriteFrame = this.itemType;
+        this.itemType = itemType;
+        this.setFrame(itemType);
+    },
+    setFrame (frameType) {
+        this.getComponent(cc.Sprite).spriteFrame = this.itemFrames[frameType];
     },
     setItemSize: function (itemSize) {
         this.itemSize = itemSize
-        this.node.width = itemSize
-        this.node.height = itemSize
+        if (this.itemType === 0) {
+            this.node.width = itemSize;
+            this.node.height = itemSize / 2;        
+        }
+        else {
+            this.node.width = itemSize / 2;
+            this.node.height = itemSize;
+        }
     },
     // 设置网格坐标
     setGridXY: function (x,y) {
@@ -60,5 +60,8 @@ cc.Class({
             cc.delayTime(delay),
             cc.moveTo(0.1, cc.p((x-5)*75 + 75/2, (y-5)*75 + 75/2))
             ));
+    },
+    onClick(){
+        console.log(this.node.x, this.node.y, this.node.width, this.node.height)
     }
 });
