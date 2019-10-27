@@ -118,25 +118,16 @@ cc.Class({
         this.node.addChild(item);
         this.items[this.itemCount] = item;
         this.itemCount += 1;
-        // if (this.containerType === 0) {  
-        //     this.node.width = this.cellSize * (this.itemCount - 1 + this.containerZoom);
-        // }
-        // else if (this.containerType === 1) {
-        //     this.node.height = this.cellSize * (this.itemCount - 1 + this.containerZoom);
-        // } 
     },
     reloadLayoutSetting () {
         var space = (this.node.width - this.itemSize * this.itemCount) / (this.itemCount + 1);
         this.getComponent(cc.Layout).paddingLeft = space;
         this.getComponent(cc.Layout).paddingRight = space;
         this.getComponent(cc.Layout).spacingX  = space;
-
-        // this.itemSize = (this.cellSize * this.itemCount - 10*2 - 10 * (this.itemCount - 1)) / this.itemCount;
-        // this.items.forEach(element => {
-        //     element.getComponent('Item').setItemSize(this.itemSize);
-        // });
     },
     onClick(){
-        console.log(this.node.x, this.node.y, this.node.width, this.node.height)
+        // console.log(this.node.x, this.node.y, this.node.width, this.node.height)
+
+        // console.log(this.node.convertToWorldSpaceAR(this.node.getPosition()))
     }
 });

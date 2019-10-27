@@ -52,16 +52,8 @@ cc.Class({
                 )));
         }
     },
-    // 移动到一个网格坐标
-    goTo: function (x,y, delay) {
-        this.gridX = x;
-        this.gridY = y;
-        this.node.runAction(cc.sequence(
-            cc.delayTime(delay),
-            cc.moveTo(0.1, cc.p((x-5)*75 + 75/2, (y-5)*75 + 75/2))
-            ));
-    },
     onClick(){
-        console.log(this.node.x, this.node.y, this.node.width, this.node.height)
+        // console.log(this.node.x, this.node.y, this.node.width, this.node.height)
+        console.log(this.node.convertToWorldSpaceAR(this.node.getPosition()))
     }
 });

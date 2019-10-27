@@ -37,9 +37,9 @@ cc.Class({
     // LIFE-CYCLE CALLBACKS:
     initCrossItems(){
         var tmpAry = []
-        for (let i = 0; i < this._difficulty.x; i++) {
+        for (let i = 0; i < this.difficultySetting.x; i++) {
             tmpAry = []
-            for (let j = 0; j < this._difficulty.y; j++) {
+            for (let j = 0; j < this.difficultySetting.y; j++) {
                 var isInit = Math.round(Math.random())
                 tmpAry.push(isInit)
             }         
@@ -47,10 +47,10 @@ cc.Class({
         }
     },
     initHorizontalContainers(){
-        for (let i = 0; i < this._difficulty.y; i++) {
+        for (let i = 0; i < this.difficultySetting.y; i++) {
             this.horizontalContainers[i] = []     
             var containerIndex = 0
-            for (let j = 0; j < this._difficulty.x; j++) {
+            for (let j = 0; j < this.difficultySetting.x; j++) {
                 var m_container = this.horizontalContainers[i][containerIndex]
                 if (this.crossItems[j][i] === 1) {
                     if (m_container == undefined){
@@ -59,7 +59,7 @@ cc.Class({
                     }                  
                     m_container.getComponent('Container').addItem()
                 }
-                if(m_container !== undefined && (this.crossItems[j][i] === 0 || j === this._difficulty.x - 1)) {
+                if(m_container !== undefined && (this.crossItems[j][i] === 0 || j === this.difficultySetting.x - 1)) {
                     this.addHorizontalContainer(i, m_container)
                     containerIndex += 1
                 }
@@ -67,10 +67,10 @@ cc.Class({
         }
     },
     initVerticalContainers(){
-        for (let i = 0; i < this._difficulty.x; i++) {
+        for (let i = 0; i < this.difficultySetting.x; i++) {
             this.verticalContainers[i] = []     
             var containerIndex = 0
-            for (let j = 0; j < this._difficulty.y; j++) {
+            for (let j = 0; j < this.difficultySetting.y; j++) {
                 var m_container = this.verticalContainers[i][containerIndex]
                 if (this.crossItems[i][j] === 1) {
                     if (m_container == undefined){
@@ -79,7 +79,7 @@ cc.Class({
                     }                  
                     m_container.getComponent('Container').addItem()
                 }
-                if(m_container !== undefined && (this.crossItems[i][j] === 0 || j === this._difficulty.y - 1)) {
+                if(m_container !== undefined && (this.crossItems[i][j] === 0 || j === this.difficultySetting.y - 1)) {
                     this.addVerticalContainer(i, m_container)
                     containerIndex += 1
                 }
@@ -138,9 +138,11 @@ cc.Class({
             }      
             if (x <= self.node.width / 2 - this.cellSize / 2 * this.itemCount && x >= self.node.width / 2 * -1 + this.cellSize / 2 * this.itemCount && !self.checkContainerHit(m_container, x, y)) {                
                 this.node.x = x;
+                self.afterMove();
             } 
             if (y <= self.node.height / 2 - this.cellSize / 2 * this.itemCount && y >= self.node.height / 2 * -1 + this.cellSize / 2 * this.itemCount && !self.checkContainerHit(m_container, x, y)) {                
                 this.node.y = y;
+                self.afterMove();
             }   
         }, m_container.getComponent('Container'));
         return m_container;
@@ -172,6 +174,52 @@ cc.Class({
             }        
         }
     },
+    afterMove(){
+        this.moveStep += 1;
+        if (this.checkIsWin()) {
+            return;
+        }
+        if (this.checkIsFail()) {
+            return;
+        }
+    },
+    checkIsWin(){
+        for (let i = 0; i < this.difficultySetting.x; i++) {
+            this.horizontalItemFlags[i] = [];
+            this.verticalItemFlags[i] = [];
+            for (let j = 0; j < this.difficultySetting.y; j++) {
+                this.horizontalItemFlags[i][j] = 0;
+                this.verticalItemFlags[i][j] = 0;
+            } 
+        }
+        this.horizontalContainers.forEach(element => {
+            element.forEach(container => {
+                container.getComponent('Container').items.forEach(item => {
+                    let gridXY = this.convertToGridXY(item);
+                    this.horizontalItemFlags[gridXY.x][gridXY.y] = 1;
+                }, this);
+            }, this);
+        }, this);
+        return false;
+    },
+    checkIsFail(){
+        if (this.moveStep >= this.difficultySetting.maxStep) {
+            console.log('game over');
+            return true;
+        }
+        return false;
+    },    
+    convertToGridXY(item){
+        let itemWorldPoint = item.convertToWorldSpaceAR(item.getPosition());
+        let boardWorldPoint = this.node.convertToWorldSpaceAR(this.node.getPosition());
+        let boardWorldStartPointX = boardWorldPoint.x - this.node.width / 2;
+        let boardWorldStartPointY = boardWorldPoint.y - this.node.height / 2;
+        let boardWorldStartPoint = cc.v2(boardWorldStartPointX, boardWorldStartPointY);
+        let x = Math.ceil((itemWorldPoint.x - boardWorldStartPoint.x) / this.horizontalGridSize);
+        let y = Math.ceil((itemWorldPoint.y - boardWorldStartPoint.y) / this.verticalGridSize);
+        let gridXY = {x: x, y: y}; 
+        return gridXY;
+    },
     switchView () {
         if (this.horizontalView.zIndex > this.verticalView.zIndex) {
             this.horizontalView.zIndex = 0;
@@ -185,22 +233,26 @@ cc.Class({
     clearBoard(){
         this.crossItems = []
     },
-    resetBoard(){
+    resetBoard(){        
+        this.difficultySetting = this.difficultyAry[this.difficulty];
+        this.horizontalGridSize = parseInt(this.node.width / this.difficultySetting.x);
+        this.verticalGridSize = parseInt(this.node.height / this.difficultySetting.y);
+        this.cellSize = this.node.width > this.node.height ? this.verticalGridSize : this.horizontalGridSize;
+        
         this.clearBoard();
         this.initCrossItems();
         this.initHorizontalContainers();
         this.initVerticalContainers();
     },
     onLoad () {        
-        this._difficulty = this.difficultyAry[this.difficulty]  
-        this.horizontalContainers = []
+        this.moveStep = 0;         
+        this.horizontalItemFlags = [];
+        this.verticalItemFlags = [];
+        this.horizontalContainers = [];
         this.horizontalItemCounts = [];
-        this.verticalContainers = []
-        this.horizontalItems = []
-        this.verticalItems = []
-        this.difficultySetting = this.difficultyAry[this.difficulty]
-        this.cellSize = this.node.width > this.node.height ? parseInt(this.node.height / this.difficultySetting.x) : parseInt(this.node.width / this.difficultySetting.y)
-        
+        this.verticalContainers = [];
+        this.horizontalItems = [];
+        this.verticalItems = [];
     },
 
     start () {
