@@ -136,11 +136,11 @@ cc.Class({
                     this.moveY = 0;
                 }                 
             }      
-            if (x <= self.node.width / 2 - this.cellSize / 2 * this.itemCount && x >= self.node.width / 2 * -1 + this.cellSize / 2 * this.itemCount && !self.checkContainerHit(m_container, x, y)) {                
+            if (this.node.x != x &&x <= self.node.width / 2 - this.cellSize / 2 * this.itemCount && x >= self.node.width / 2 * -1 + this.cellSize / 2 * this.itemCount && !self.checkContainerHit(m_container, x, y)) {                
                 this.node.x = x;
                 self.afterMove();
             } 
-            if (y <= self.node.height / 2 - this.cellSize / 2 * this.itemCount && y >= self.node.height / 2 * -1 + this.cellSize / 2 * this.itemCount && !self.checkContainerHit(m_container, x, y)) {                
+            if (this.node.y != y && y <= self.node.height / 2 - this.cellSize / 2 * this.itemCount && y >= self.node.height / 2 * -1 + this.cellSize / 2 * this.itemCount && !self.checkContainerHit(m_container, x, y)) {                
                 this.node.y = y;
                 self.afterMove();
             }   
@@ -177,6 +177,7 @@ cc.Class({
     afterMove(){
         this.moveStep += 1;
         if (this.checkIsWin()) {
+            console.log('win');
             return;
         }
         if (this.checkIsFail()) {
@@ -196,21 +197,38 @@ cc.Class({
             element.forEach(container => {
                 container.getComponent('Container').items.forEach(item => {
                     let gridXY = this.convertToGridXY(item);
-                    this.horizontalItemFlags[gridXY.x][gridXY.y] = 1;
+                    this.horizontalItemFlags[gridXY.x - 1][gridXY.y - 1] = 1;
                 }, this);
             }, this);
         }, this);
+        this.verticalContainers.forEach(element => {
+            element.forEach(container => {
+                container.getComponent('Container').items.forEach(item => {
+                    let gridXY = this.convertToGridXY(item);
+                    this.verticalItemFlags[gridXY.x - 1][gridXY.y - 1] = 1;
+                }, this);
+            }, this);
+        }, this);
+        console.log(this.horizontalItemFlags,this.verticalItemFlags);
+        let success = this.horizontalItemFlags.every(function(v1, i){
+            return v1.every(function(v2, j){
+                return this.verticalItemFlags[i][j] === v2
+            }, this)
+        }, this)
+        if (success) {
+            return true;
+        }
         return false;
     },
     checkIsFail(){
         if (this.moveStep >= this.difficultySetting.maxStep) {
-            console.log('game over');
+            // console.log('game over');
             return true;
         }
         return false;
     },    
     convertToGridXY(item){
-        let itemWorldPoint = item.convertToWorldSpaceAR(item.getPosition());
+        let itemWorldPoint = item.convertToWorldSpaceAR(cc.v2(0, 0));
         let boardWorldPoint = this.node.convertToWorldSpaceAR(this.node.getPosition());
         let boardWorldStartPointX = boardWorldPoint.x - this.node.width / 2;
         let boardWorldStartPointY = boardWorldPoint.y - this.node.height / 2;
@@ -219,6 +237,13 @@ cc.Class({
         let y = Math.ceil((itemWorldPoint.y - boardWorldStartPoint.y) / this.verticalGridSize);
         let gridXY = {x: x, y: y}; 
         return gridXY;
+
+        // let itemPoint = this.node.convertToNodeSpace(item.getPosition());
+        // let x = Math.ceil(itemPoint.x / this.horizontalGridSize);
+        // let y = Math.ceil(itemPoint.y / this.verticalGridSize);
+        // let gridXY = {x: x, y: y}; 
+        // return gridXY;
+
     },
     switchView () {
         if (this.horizontalView.zIndex > this.verticalView.zIndex) {
@@ -243,6 +268,9 @@ cc.Class({
         this.initCrossItems();
         this.initHorizontalContainers();
         this.initVerticalContainers();
+        if (this.checkIsWin()) {
+            this.resetBoard();
+        }
     },
     onLoad () {        
         this.moveStep = 0;         

@@ -128,6 +128,6 @@ cc.Class({
     onClick(){
         // console.log(this.node.x, this.node.y, this.node.width, this.node.height)
 
-        // console.log(this.node.convertToWorldSpaceAR(this.node.getPosition()))
+        // console.log(this.node.parent.convertToWorldSpaceAR(this.node.getPosition()))
     }
 });
