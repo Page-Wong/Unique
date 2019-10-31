@@ -31,6 +31,18 @@ cc.Class({
         difficulty:{
             type:cc.Integer,
             default:0,
+        },
+        score:{
+            type: cc.Label,
+            default: null
+        },
+        winView: {
+            type:cc.Prefab,
+            default:null,
+        },
+        failView: {
+            type:cc.Prefab,
+            default:null,
         }
     },
 
@@ -112,6 +124,14 @@ cc.Class({
         m_container.getComponent('Container').setCellSize(this.cellSize);
         var self = this;
         m_container.on(cc.Node.EventType.TOUCH_MOVE, function (event) {
+            if (self.isWin) {
+                self.showWinView();
+                return;
+            }
+            else if (self.isFail) {
+                self.showFailView();
+                return;
+            }
             var x = this.node.x;
             var y = this.node.y;
             if (this.containerType === 0) {  
@@ -176,12 +196,14 @@ cc.Class({
     },
     afterMove(){
         this.moveStep += 1;
-        if (this.checkIsWin()) {
-            console.log('win');
-            return;
+        this.score.string = this.moveStep + '/' + this.difficultySetting.maxStep;
+        this.isWin = this.checkIsWin();
+        this.isFail = !this.isWin && this.checkIsFail();
+        if (this.isWin) {
+            this.showWinView();
         }
-        if (this.checkIsFail()) {
-            return;
+        else if (this.isFail) {
+            this.showFailView();
         }
     },
     checkIsWin(){
@@ -209,7 +231,7 @@ cc.Class({
                 }, this);
             }, this);
         }, this);
-        console.log(this.horizontalItemFlags,this.verticalItemFlags);
+        // console.log(this.horizontalItemFlags,this.verticalItemFlags);
         let success = this.horizontalItemFlags.every(function(v1, i){
             return v1.every(function(v2, j){
                 return this.verticalItemFlags[i][j] === v2
@@ -221,12 +243,41 @@ cc.Class({
         return false;
     },
     checkIsFail(){
-        if (this.moveStep >= this.difficultySetting.maxStep) {
-            // console.log('game over');
-            return true;
-        }
-        return false;
+        this.isFail = this.moveStep >= this.difficultySetting.maxStep;
+        return this.isFail;
     },    
+    showWinView(){
+        if (this.m_winView === undefined) {
+            this.m_winView = cc.instantiate(this.winView);
+            this.m_winView.parent = this.node.parent;
+        }
+        this.m_winView.getComponent('Dialog').showView();
+        console.log('showWinView');
+
+    },    
+    showFailView(){
+        if (this.m_failView === undefined) {
+            this.m_failView = cc.instantiate(this.failView);
+            this.m_failView.parent = this.node.parent;
+        }
+        this.m_failView.getComponent('Dialog').showView();
+        console.log('showFailView');        
+    },   
+    hideWinView(){
+        if (this.m_winView === undefined) {
+            this.m_winView = cc.instantiate(this.winView);
+            this.m_winView.parent = this.node.parent;
+        }
+        this.m_winView.getComponent('Dialog').hideView();
+
+    },    
+    hideFailView(){
+        if (this.m_failView === undefined) {
+            this.m_failView = cc.instantiate(this.winView);
+            this.m_failView.parent = this.node.parent;
+        }
+        this.m_failView.getComponent('Dialog').hideView();   
+    },
     convertToGridXY(item){
         let itemWorldPoint = item.convertToWorldSpaceAR(cc.v2(0, 0));
         let boardWorldPoint = this.node.convertToWorldSpaceAR(this.node.getPosition());
@@ -259,7 +310,8 @@ cc.Class({
         this.crossItems = []
     },
     resetBoard(){        
-        this.difficultySetting = this.difficultyAry[this.difficulty];
+        this.difficultySetting = this.difficultyAry[this.difficulty];        
+        this.score.string = this.moveStep + '/' + this.difficultySetting.maxStep;
         this.horizontalGridSize = parseInt(this.node.width / this.difficultySetting.x);
         this.verticalGridSize = parseInt(this.node.height / this.difficultySetting.y);
         this.cellSize = this.node.width > this.node.height ? this.verticalGridSize : this.horizontalGridSize;
