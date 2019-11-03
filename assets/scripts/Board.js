@@ -1,20 +1,24 @@
-var difficultySetting=cc.Class({
-    name:'difficultySetting',
-    properties:{
-        x:{
-            type:cc.Integer,
-            default:0,
-        },
-        y:{
-            type:cc.Integer,
-            default:0,
-        },
-        maxStep:{
-            type:cc.Integer,
-            default:0,
-        },
-    }
-})
+// var difficultySetting=cc.Class({
+//     name:'difficultySetting',
+//     properties:{
+//         x:{
+//             type:cc.Integer,
+//             default:0,
+//         },
+//         y:{
+//             type:cc.Integer,
+//             default:0,
+//         },
+//         maxStep:{
+//             type:cc.Integer,
+//             default:0,
+//         },
+//         coinStep:{
+//             type:cc.Integer,
+//             default:0,
+//         },
+//     }
+// })
 
 cc.Class({
     extends: cc.Component,
@@ -24,26 +28,34 @@ cc.Class({
             type:cc.Prefab,
             default:null,
         },
-        difficultyAry:{
-            type:[difficultySetting],
-            default:[],
-        },
-        difficulty:{
-            type:cc.Integer,
-            default:0,
-        },
+        // difficultyAry:{
+        //     type:[difficultySetting],
+        //     default:[],
+        // },
+        // difficulty:{
+        //     type:cc.Integer,
+        //     default:0,
+        // },
         score:{
             type: cc.Label,
             default: null
         },
-        winView: {
-            type:cc.Prefab,
-            default:null,
+        main:{
+            type: cc.Component,
+            default: null
         },
-        failView: {
-            type:cc.Prefab,
-            default:null,
-        }
+        // startView: {
+        //     type:cc.Prefab,
+        //     default:null,
+        // },
+        // winView: {
+        //     type:cc.Prefab,
+        //     default:null,
+        // },
+        // failView: {
+        //     type:cc.Prefab,
+        //     default:null,
+        // }
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -128,7 +140,7 @@ cc.Class({
                 self.showWinView();
                 return;
             }
-            else if (self.isFail) {
+            else if (self.checkIsFail()) {
                 self.showFailView();
                 return;
             }
@@ -195,8 +207,7 @@ cc.Class({
         }
     },
     afterMove(){
-        this.moveStep += 1;
-        this.score.string = this.moveStep + '/' + this.difficultySetting.maxStep;
+        this.c_main.addStep();
         this.isWin = this.checkIsWin();
         this.isFail = !this.isWin && this.checkIsFail();
         if (this.isWin) {
@@ -231,7 +242,7 @@ cc.Class({
                 }, this);
             }, this);
         }, this);
-        // console.log(this.horizontalItemFlags,this.verticalItemFlags);
+        console.log(this.horizontalItemFlags,this.verticalItemFlags);
         let success = this.horizontalItemFlags.every(function(v1, i){
             return v1.every(function(v2, j){
                 return this.verticalItemFlags[i][j] === v2
@@ -243,49 +254,51 @@ cc.Class({
         return false;
     },
     checkIsFail(){
-        this.isFail = this.moveStep >= this.difficultySetting.maxStep;
+        this.isFail = !this.c_main.checkStep();
         return this.isFail;
     },    
     showWinView(){
-        if (this.m_winView === undefined) {
-            this.m_winView = cc.instantiate(this.winView);
-            this.m_winView.parent = this.node.parent;
-        }
-        this.m_winView.getComponent('Dialog').showView();
-        console.log('showWinView');
+        // if (this.m_winView === undefined) {
+        //     this.m_winView = cc.instantiate(this.winView);
+        //     this.m_winView.parent = this.node.parent;
+        // }
+        // this.m_winView.getComponent('Dialog').showView();
+        this.c_main.showWinView(true);
+        // console.log('showWinView');
 
     },    
     showFailView(){
-        if (this.m_failView === undefined) {
-            this.m_failView = cc.instantiate(this.failView);
-            this.m_failView.parent = this.node.parent;
-        }
-        this.m_failView.getComponent('Dialog').showView();
-        console.log('showFailView');        
+        // if (this.m_failView === undefined) {
+        //     this.m_failView = cc.instantiate(this.failView);
+        //     this.m_failView.parent = this.node.parent;
+        // }
+        // this.m_failView.getComponent('Dialog').showView();
+        this.c_main.showFailView(true);
+        // console.log('showFailView');        
     },   
-    hideWinView(){
-        if (this.m_winView === undefined) {
-            this.m_winView = cc.instantiate(this.winView);
-            this.m_winView.parent = this.node.parent;
-        }
-        this.m_winView.getComponent('Dialog').hideView();
+    // hideWinView(){
+    //     if (this.m_winView === undefined) {
+    //         this.m_winView = cc.instantiate(this.winView);
+    //         this.m_winView.parent = this.node.parent;
+    //     }
+    //     this.m_winView.getComponent('Dialog').hideView();
 
-    },    
-    hideFailView(){
-        if (this.m_failView === undefined) {
-            this.m_failView = cc.instantiate(this.winView);
-            this.m_failView.parent = this.node.parent;
-        }
-        this.m_failView.getComponent('Dialog').hideView();   
-    },
+    // },    
+    // hideFailView(){
+    //     if (this.m_failView === undefined) {
+    //         this.m_failView = cc.instantiate(this.winView);
+    //         this.m_failView.parent = this.node.parent;
+    //     }
+    //     this.m_failView.getComponent('Dialog').hideView();   
+    // },
     convertToGridXY(item){
         let itemWorldPoint = item.convertToWorldSpaceAR(cc.v2(0, 0));
         let boardWorldPoint = this.node.convertToWorldSpaceAR(this.node.getPosition());
         let boardWorldStartPointX = boardWorldPoint.x - this.node.width / 2;
         let boardWorldStartPointY = boardWorldPoint.y - this.node.height / 2;
-        let boardWorldStartPoint = cc.v2(boardWorldStartPointX, boardWorldStartPointY);
-        let x = Math.ceil((itemWorldPoint.x - boardWorldStartPoint.x) / this.horizontalGridSize);
-        let y = Math.ceil((itemWorldPoint.y - boardWorldStartPoint.y) / this.verticalGridSize);
+        // let boardWorldStartPoint = cc.v2(boardWorldStartPointX, boardWorldStartPointY);
+        let x = Math.ceil((itemWorldPoint.x - boardWorldStartPointX) / this.horizontalGridSize);
+        let y = Math.ceil((itemWorldPoint.y - boardWorldStartPointY) / this.verticalGridSize);
         let gridXY = {x: x, y: y}; 
         return gridXY;
 
@@ -306,12 +319,26 @@ cc.Class({
             this.verticalView.zIndex = 0;
         }
     },
-    clearBoard(){
-        this.crossItems = []
+    clearBoard(){        
+        this.isWin = false;
+        this.isFail = false;
+        this.crossItems = [];        
+        this.horizontalItemFlags = [];
+        this.verticalItemFlags = [];
+        this.horizontalContainers = [];
+        this.horizontalItemCounts = [];
+        this.verticalContainers = [];
+        this.horizontalItems = [];
+        this.verticalItems = [];
+        this.node.getChildByName('HorizontalView').removeAllChildren();
+        this.node.getChildByName('VerticalView').removeAllChildren();
     },
-    resetBoard(){        
-        this.difficultySetting = this.difficultyAry[this.difficulty];        
-        this.score.string = this.moveStep + '/' + this.difficultySetting.maxStep;
+    resetBoard(difficultySetting){        
+        this.difficultySetting = difficultySetting;  
+        // this.m_score = this.score.getComponent('Score');
+        this.c_main.maxStep = this.difficultySetting.maxStep;
+        this.c_main.coinStep = this.difficultySetting.coinStep;
+        this.c_main.updateScore(0);
         this.horizontalGridSize = parseInt(this.node.width / this.difficultySetting.x);
         this.verticalGridSize = parseInt(this.node.height / this.difficultySetting.y);
         this.cellSize = this.node.width > this.node.height ? this.verticalGridSize : this.horizontalGridSize;
@@ -320,27 +347,28 @@ cc.Class({
         this.initCrossItems();
         this.initHorizontalContainers();
         this.initVerticalContainers();
-        if (this.checkIsWin()) {
-            this.resetBoard();
-        }
+        this.scheduleOnce(function(){
+            if (this.checkIsWin()) {
+                this.resetBoard(difficultySetting);
+            }
+        });
     },
-    onLoad () {        
-        this.moveStep = 0;         
-        this.horizontalItemFlags = [];
-        this.verticalItemFlags = [];
-        this.horizontalContainers = [];
-        this.horizontalItemCounts = [];
-        this.verticalContainers = [];
-        this.horizontalItems = [];
-        this.verticalItems = [];
-    },
+    // onLoad () {         
+    // },
 
     start () {
         this.horizontalView = this.node.getChildByName('HorizontalView');
         this.verticalView = this.node.getChildByName('VerticalView');
         this.horizontalView.zIndex = 0;
         this.verticalView.zIndex = 1;
-        this.resetBoard();
+        this.c_main = this.main.getComponent('Main');
+        // if (this.m_startView === undefined) {
+        //     this.m_startView = cc.instantiate(this.startView);
+        //     this.m_startView.parent = this.node.parent;
+        //     this.m_startView = this.m_startView.getComponent('Start')
+        // }
+        // this.m_startView.showView(); 
+        // this.resetBoard();
 
     },
 
