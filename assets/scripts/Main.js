@@ -35,6 +35,10 @@ cc.Class({
         failView: {
             type:cc.Prefab,
             default:null,
+        },
+        tipsView: {
+            type:cc.Prefab,
+            default:null,
         }
     },
 
@@ -45,10 +49,14 @@ cc.Class({
     start () {     
         this.maxStep = 0;
         this.coinStep = 0;
+        this.c_borad = this.board.getComponent('Board');
         this.showStartView(true);   
     },
-    startGame(difficultySetting){
-        this.board.getComponent('Board').resetBoard(difficultySetting);
+    startGame(difficultySetting){   
+        if (this.c_tipsView != undefined) {
+            this.c_tipsView.clearView();
+        }
+        this.c_borad.resetBoard(difficultySetting);
     },    
     checkStep(){
         return this.step < this.maxStep;
@@ -101,6 +109,18 @@ cc.Class({
             this.c_failView = this.m_failView.getComponent('Fail')
         }
         this.m_failView.active = isShow;
+    },
+    showTipsView(){     
+        if (this.m_tipsView === undefined) {
+            this.m_tipsView = cc.instantiate(this.tipsView);
+            this.m_tipsView.active = false;
+            this.m_tipsView.parent = this.node;
+            this.c_tipsView = this.m_tipsView.getComponent('Tips');
+        }
+        if (this.c_tipsView.board.childrenCount <= 0) {
+            this.c_tipsView.initTipsView(this.c_borad.crossItems, this.c_borad.cellSize)
+        }
+        this.m_tipsView.active = true;
     },
     // update (dt) {},
 });

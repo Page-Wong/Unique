@@ -69,7 +69,19 @@ cc.Class({
             }         
             this.crossItems.push(tmpAry)
         }
+
     },
+    // initTipsView(){
+    //     this.c_main.m_tipsView.removeAllChildren();
+    //     this.c_main.c_tipsView.setItemSize(this.cellSize);
+    //     for (let i = 0; i < this.difficultySetting.x; i++) {
+    //         for (let j = 0; j < this.difficultySetting.y; j++) {
+    //             if (this.crossItems[i][j] === 1) {                    
+    //                 this.c_main.c_tipsView.addItem(i, j);
+    //             }
+    //         }
+    //     }
+    // },
     initHorizontalContainers(){
         for (let i = 0; i < this.difficultySetting.y; i++) {
             this.horizontalContainers[i] = []     
@@ -258,56 +270,21 @@ cc.Class({
         return this.isFail;
     },    
     showWinView(){
-        // if (this.m_winView === undefined) {
-        //     this.m_winView = cc.instantiate(this.winView);
-        //     this.m_winView.parent = this.node.parent;
-        // }
-        // this.m_winView.getComponent('Dialog').showView();
         this.c_main.showWinView(true);
-        // console.log('showWinView');
 
     },    
     showFailView(){
-        // if (this.m_failView === undefined) {
-        //     this.m_failView = cc.instantiate(this.failView);
-        //     this.m_failView.parent = this.node.parent;
-        // }
-        // this.m_failView.getComponent('Dialog').showView();
-        this.c_main.showFailView(true);
-        // console.log('showFailView');        
+        this.c_main.showFailView(true);       
     },   
-    // hideWinView(){
-    //     if (this.m_winView === undefined) {
-    //         this.m_winView = cc.instantiate(this.winView);
-    //         this.m_winView.parent = this.node.parent;
-    //     }
-    //     this.m_winView.getComponent('Dialog').hideView();
-
-    // },    
-    // hideFailView(){
-    //     if (this.m_failView === undefined) {
-    //         this.m_failView = cc.instantiate(this.winView);
-    //         this.m_failView.parent = this.node.parent;
-    //     }
-    //     this.m_failView.getComponent('Dialog').hideView();   
-    // },
     convertToGridXY(item){
         let itemWorldPoint = item.convertToWorldSpaceAR(cc.v2(0, 0));
         let boardWorldPoint = this.node.convertToWorldSpaceAR(this.node.getPosition());
         let boardWorldStartPointX = boardWorldPoint.x - this.node.width / 2;
         let boardWorldStartPointY = boardWorldPoint.y - this.node.height / 2;
-        // let boardWorldStartPoint = cc.v2(boardWorldStartPointX, boardWorldStartPointY);
         let x = Math.ceil((itemWorldPoint.x - boardWorldStartPointX) / this.horizontalGridSize);
         let y = Math.ceil((itemWorldPoint.y - boardWorldStartPointY) / this.verticalGridSize);
         let gridXY = {x: x, y: y}; 
         return gridXY;
-
-        // let itemPoint = this.node.convertToNodeSpace(item.getPosition());
-        // let x = Math.ceil(itemPoint.x / this.horizontalGridSize);
-        // let y = Math.ceil(itemPoint.y / this.verticalGridSize);
-        // let gridXY = {x: x, y: y}; 
-        // return gridXY;
-
     },
     switchView () {
         if (this.horizontalView.zIndex > this.verticalView.zIndex) {
@@ -345,6 +322,7 @@ cc.Class({
         
         this.clearBoard();
         this.initCrossItems();
+        // this.initTipsView();
         this.initHorizontalContainers();
         this.initVerticalContainers();
         this.scheduleOnce(function(){

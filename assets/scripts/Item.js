@@ -26,19 +26,20 @@ cc.Class({
     },
     setItemSize: function (itemSize) {
         this.itemSize = itemSize
+        this.node.width = itemSize;
+        this.node.height = itemSize;
         if (this.itemType === 0) {
-            this.node.width = itemSize;
             this.node.height = itemSize / 2;        
         }
-        else {
+        else if (this.itemType === 1) {
             this.node.width = itemSize / 2;
-            this.node.height = itemSize;
         }
     },
     // 设置网格坐标
     setGridXY: function (x,y) {
         this.gridX = x;
-        this.gridY = y;
+        this.gridY = y;         
+        this.node.setPosition(this.node.parent.width / 2 * -1 + this.itemSize / 2 * (x * 2 + 1), this.node.parent.height / 2 * -1 + this.itemSize / 2 * (y * 2 + 1));        
     },
     setSelected:function(selected) {
         if (!selected) {
